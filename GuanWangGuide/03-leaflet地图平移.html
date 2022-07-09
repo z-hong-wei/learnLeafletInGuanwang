@@ -1,0 +1,47 @@
+<!--********************************************************************
+* Copyright© 2000 - 2022 SuperMap Software Co.Ltd. All rights reserved.
+*********************************************************************-->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>地图平移 panTo flyTo</title>
+    <script type="text/javascript" src="../js/include-web.js"></script>
+</head>
+<body style=" margin: 0;overflow: hidden;background: #fff;width: 100%;height:100%;position: absolute;top: 0;">
+<div id="map" style="margin:0 auto;width: 100%;height: 100%"></div>
+<script type="text/javascript" src="../dist/leaflet/include-leaflet.js"></script>
+<script type="text/javascript">
+
+    // let mapurl ="http://localhost:8090/iserver/services/map-ChengduFresh/rest/maps/ChengduMap"
+    let mapurl = 'https://iserver.supermap.io/iserver/services/map-china400/rest/maps/China'
+    
+    let map = L.map('map', {
+        preferCanvas: true,
+        center: [39.89, 116.35],
+        maxZoom: 18,
+        zoom: 11
+    });
+    new L.supermap.ImageMapLayer(mapurl, {transparent: false}).addTo(map);
+
+
+
+   
+    // panTo - 将地图平移到一个指定的中心点。分大小写-panTo
+    setTimeout(()=>{
+        map.panTo([30.410754,104.546773])
+    
+            setTimeout(()=>{
+            map.panTo([39.89, 116.35])
+        },3000)
+    },2000)
+
+    // 所有接受 LatLng 对象的 Leaflet 方法也接受它们的简单数组形式和简单对象形式（除非另有说明），所以这些行是等价的:
+    // map.panTo([50, 30]);
+    // map.panTo({lon: 30, lat: 50});
+    // map.panTo({lat: 50, lng: 30});
+    // map.panTo(L.latLng(50, 30));
+
+</script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!--********************************************************************
+* Copyright© 2000 - 2022 SuperMap Software Co.Ltd. All rights reserved.
+*********************************************************************-->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>marker popup</title>
+    <script type="text/javascript" src="../js/include-web.js"></script>
+</head>
+<body style=" margin: 0;overflow: hidden;background: #fff;width: 100%;height:100%;position: absolute;top: 0;">
+<div id="map" style="margin:0 auto;width: 100%;height: 100%"></div>
+<script type="text/javascript" src="../dist/leaflet/include-leaflet.js"></script>
+<script type="text/javascript">
+
+    // let mapurl ="http://localhost:8090/iserver/services/map-ChengduFresh/rest/maps/ChengduMap"
+    let mapurl = 'https://iserver.supermap.io/iserver/services/map-china400/rest/maps/China'
+    
+    let map = L.map('map', {
+        preferCanvas: true,
+        center: [39.89, 116.35],
+        maxZoom: 18,
+        zoom: 11
+    });
+    new L.supermap.ImageMapLayer(mapurl, {transparent: false}).addTo(map);
+
+    // 标记
+    let marker = L.marker([39.89, 116.35]).addTo(map);
+
+    // 圆形标记
+    let circle = L.circle([39.896, 116.356], {
+        color: 'red',
+        fillColor: '#f03',
+        fillOpacity: 0.5,
+        radius: 500
+    }).addTo(map);
+
+    // 多边形
+    let polygon = L.polygon([
+        [39.896, 116.356],
+        [39.90, 116.36],
+        [39.886, 116.376],
+    ]).addTo(map);
+
+    
+    // 弹窗
+    marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup();
+    circle.bindPopup("I am a circle.");
+    polygon.bindPopup("I am a polygon.");
+
+    // 将弹出窗口用作图层
+    // 这里我们使用 openOn 而不是 addTo 因为它在打开一个新窗口时，先前打开的弹出窗口会自动关闭。
+    setTimeout(()=>{
+        let popup = L.popup()
+        .setLatLng([39.91, 116.37])
+        .setContent("I am a standalone popup.")
+        .openOn(map);
+    },2000)
+
+
+</script>
+</body>
+</html>

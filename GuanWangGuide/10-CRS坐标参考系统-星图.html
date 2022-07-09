@@ -1,0 +1,112 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	
+	<title>CRS.Simple example - Leaflet</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+
+    <link rel="stylesheet" href="../resource/leaflet.css"/>
+    <script src="../resource/leaflet.js"></script>
+
+
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+		#map {
+			width: 100%;
+			height: 100vh;
+		}
+	</style>
+
+	
+</head>
+<body>
+
+<div id='map'></div>
+
+<script>
+
+	var map = L.map('map', {
+		crs: L.CRS.Simple,//使用 CRS.Simple 来代表一个正方形网格
+		minZoom: -3 //整个地图大约有 1000x1000 像素大，无法放入我们的 HTML 容器中
+	});
+
+	var bounds = [[-26.5,-25], [1021.5,1023]];//测量 0 和 1000 坐标之间有多少像素，并进行外推，我们可以为该图像获得正确的坐标范围：
+	var image = L.imageOverlay('./img/uqm_map_400px.png', bounds).addTo(map);
+
+	map.setView( [70, 120], 1);
+
+    // var sol = L.latLng([ 145, 175 ]);
+    // L.marker(sol).addTo(map);
+
+    let greenIcon = L.icon({
+        iconUrl: './img/leaf-green.png',
+        shadowUrl: './img/leaf-shadow.png',
+
+        iconSize:     [38, 95], // size of the icon
+        shadowSize:   [50, 64], // size of the shadow
+        iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
+        shadowAnchor: [4, 62],  // the same for the shadow
+        popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+    });
+
+    L.marker([39.89, 116.35], {icon: greenIcon}).bindPopup("hello world,CRS-星图").addTo(map);
+	
+
+    // CRS.Simple 中的坐标采用 [y, x] 的形式，而不是 [x, y]，就像 Leaflet 使用 [lat, lng] 而不是 [lng, lat] 一样。 
+    // 由于缺乏共识，Leaflet 有一个名为 L.LatLng 的类，而不是更容易引起混淆的 L.Coordinate。
+    // 创建包装器：
+    var yx = L.latLng;
+
+    var xy = function(x, y) {
+        if (L.Util.isArray(x)) {    // When doing xy([x, y]);
+            return yx(x[1], x[0]);
+        }
+        return yx(y, x);  // When doing xy(x, y);
+    };
+
+    // [lat, lng] or [lng, lat]  都可以了
+    var sol      = xy(175.2, 145.0);
+    var mizar    = xy( 41.6, 130.1);
+    var kruegerZ = xy( 56.5,  13.4);
+    var deneb    = xy(218.7,   8.3);
+
+    L.marker(     sol,{icon: greenIcon}).addTo(map).bindPopup(      'Sol');
+    L.marker(   mizar,{icon: greenIcon}).addTo(map).bindPopup(    'Mizar');
+    L.marker(kruegerZ,{icon: greenIcon}).addTo(map).bindPopup('Krueger-Z');
+    L.marker(   deneb,{icon: greenIcon}).addTo(map).bindPopup(    'Deneb');
+
+    var travel = L.polyline([sol, deneb]).addTo(map);
+
+
+    // 这样可以
+    map.on('click',function (e) {
+        console.log(e.latlng)
+    })
+
+    /*
+        // 这样也可以
+        function onMapClick(e) {
+            console.log(e.latlng)
+        }
+        map.on('click', onMapClick);
+        
+        // 这样不行
+        map.on('click',()=>{
+            console.log("e.latLng:",e.latLng)
+        })
+    */ 
+
+</script>
+
+
+
+</body>
+</html>

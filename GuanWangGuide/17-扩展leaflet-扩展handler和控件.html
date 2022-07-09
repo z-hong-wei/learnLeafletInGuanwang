@@ -1,0 +1,122 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	
+	<title>扩展handler和control</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+
+	<link rel="stylesheet" href="../resource/leaflet.css"/>
+    <script src="../resource/leaflet.js"></script>
+
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+		#map {
+			width: 100%;
+			height: 100vh;
+		}
+	</style>
+
+	<style>#map { width: 100vw; height: 100%; }</style>
+</head>
+<body>
+<h1>没有实例-只看代码</h1>
+<div id='map'></div>
+
+<script type="text/javascript">
+// layer - （图层）-是任何能随地图移动的东西 - 16-扩展leaflet-扩展方法.html
+// control - （控件）- 是一个相对于地图容器保持静态的 HTML 元素
+// handler - (处理程序) - 是一段改变地图行为的不可见代码
+
+
+// 处理程序 - 流程
+// 它们只需要一个 addHooks() 方法（在映射中启用处理程序时运行）和一个 removeHooks() 方法（在禁用处理程序时运行）。处理程序的骨架是：
+
+L.CustomHandler = L.Handler.extend({
+    addHooks: function() {
+        L.DomEvent.on(document, 'eventname', this._doSomething, this);
+    },
+
+    removeHooks: function() {
+        L.DomEvent.off(document, 'eventname', this._doSomething, this);
+    },
+
+    _doSomething: function(event) { '...' }
+});
+
+// 这可以用一个简单的处理程序来说明 - 当移动设备倾斜时，通过 deviceorientation 事件来平移地图：
+L.TiltHandler = L.Handler.extend({
+    addHooks: function() {
+        L.DomEvent.on(window, 'deviceorientation', this._tilt, this);
+    },
+
+    removeHooks: function() {
+        L.DomEvent.off(window, 'deviceorientation', this._tilt, this);
+    },
+
+    _tilt: function(ev) {
+        // Treat Gamma angle as horizontal pan (1 degree = 1 pixel) and Beta angle as vertical pan
+        this._map.panBy( L.point( ev.gamma, ev.beta ) );
+    }
+});
+
+// 添加处理程序
+L.Map.addInitHook('addHandler', 'tilt', L.TiltHandler);
+// 我们的处理程序现在可以通过运行 map.tilt.enable() 来启用，并通过 map.tilt.disable() 来禁用
+
+// 此外，如果地图具有与处理程序名称相同的属性，那么如果该选项为 true，则该处理程序将默认启用，因此这将默认启用我们的处理程序：
+var map = L.map('mapDiv', { tilt: true });
+
+
+
+
+
+// 控件（Controls）
+// 本质上，L.Control 是一个 HTML 元素，位于地图容器中的静态位置。
+// 要制作一个控件，只需继承 L.Control 并实现 onAdd() 和 onRemove()。每当控件被添加到地图或从地图中移除时，它们都会运行
+// onAdd() 必须返回一个代表控件的 HTMLElement 实例
+
+// 自定义控件的最简单示例是水印，它只是一个图像：
+    var map = L.map('map', {
+		center: [40, 0],
+		zoom: 1
+	});
+
+	var positron = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+		// attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attribution">CARTO</a>'
+	}).addTo(map);
+
+	L.Control.Watermark = L.Control.extend({
+		onAdd: function(map) {
+			var img = L.DomUtil.create('img');
+			
+			img.src = './img/logo.png';
+			img.style.width = '200px';
+			
+			return img;
+		},
+		
+		onRemove: function(map) {
+			// Nothing to do here
+		}
+	});
+
+	L.control.watermark = function(opts) {
+		return new L.Control.Watermark(opts);
+	}
+	
+	L.control.watermark({ position: 'bottomleft' }).addTo(map);
+
+</script>
+
+
+
+</body>
+</html>

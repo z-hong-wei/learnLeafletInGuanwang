@@ -1,0 +1,47 @@
+<!--********************************************************************
+* Copyright© 2000 - 2022 SuperMap Software Co.Ltd. All rights reserved.
+*********************************************************************-->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>处理事件</title>
+    <script type="text/javascript" src="../js/include-web.js"></script>
+</head>
+<body style=" margin: 0;overflow: hidden;background: #fff;width: 100%;height:100%;position: absolute;top: 0;">
+<div id="map" style="margin:0 auto;width: 100%;height: 100%"></div>
+<script type="text/javascript" src="../dist/leaflet/include-leaflet.js"></script>
+<script type="text/javascript">
+
+    // let mapurl ="http://localhost:8090/iserver/services/map-ChengduFresh/rest/maps/ChengduMap"
+    let mapurl = 'https://iserver.supermap.io/iserver/services/map-china400/rest/maps/China'
+    
+    let map = L.map('map', {
+        preferCanvas: true,
+        center: [39.89, 116.35],
+        maxZoom: 18,
+        zoom: 11
+    });
+    new L.supermap.ImageMapLayer(mapurl, {transparent: false}).addTo(map);
+
+
+    // 处理事件
+    // 每个对象都有属于自己的一组事件——详情请参阅文档。
+    // 监听器、函数的第一个参数是一个事件对象——它包含关于发生的事件的有用信息,例如上面的地图点击事件的e
+    let popup = L.popup();
+    function onMapClick(e) {
+        // console.log("处理事件 - You clicked the map at " + e.latlng);
+
+        popup
+        .setLatLng(e.latlng)
+        .setContent("You clicked the map at " + e.latlng.toString())
+        .openOn(map);
+    }
+
+    map.on('click', onMapClick);
+
+
+
+</script>
+</body>
+</html>

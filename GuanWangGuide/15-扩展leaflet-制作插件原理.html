@@ -1,0 +1,168 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	
+	<title>Leaflet class diagram - Leaflet</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+
+	<link rel="stylesheet" href="../resource/leaflet.css"/>
+    <script src="../resource/leaflet.js"></script>
+
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+		#map {
+			width: 100%;
+			height: 100vh;
+		}
+	</style>
+
+	<style>#map { width: 100vw; height: 100%; }</style>
+</head>
+<body>
+<h1> F12 -> 控制台 cosole.log </h1>
+
+<div id='map'></div>
+
+<script type="text/javascript">
+// Leaflet 有很多好用的插件，原因在于Leaflet 易于扩展
+
+// 从技术角度来看，Leaflet 可以通过不同的方式进行扩展：
+/*
+    L.Class.extend() - 最常用的方式
+        使用 L.Class.extend() 来创建一个新的 L.Layer, L.Handler 或者 L.Control 的子类
+            当地图移动/缩放时图层会移动
+            处理程序不可见并解释浏览器事件
+            控件是固定的界面元素
+    L.Class.include() - 在一个现有的类中加入更多的功能
+        使用用 L.Class.include() 改变一个现有类的部分内容（替换一个类方法的工作方式）。
+            添加新方法和选项
+            改变一些方法
+            使用 addInitHook 来运行额外的构造器代码
+
+*/ 
+
+
+
+
+
+
+// JS - 面向原型的语言 - 通过 L.Class 来解决类的继承问题（更加简化）
+
+// L.Class.extend() - 直接创建一个新的类
+var MyDemoClass = L.Class.extend({
+
+    myDemoProperty: 42,   
+
+    myDemoMethod: function() { return this.myDemoProperty; }
+
+});
+
+var myDemoInstance = new MyDemoClass();
+
+console.log( myDemoInstance.myDemoMethod() );   //42
+
+// 在命名类、方法和属性时，请遵循以下约定：
+/*
+    函数、方法、属性和工厂名称应使用 lowerCamelCase
+    类名应使用 UpperCamelCase
+    私有属性和方法以下划线（_）开头。这并不意味着它们是私有的，只是建议开发者不要直接使用它们
+*/ 
+
+
+
+
+
+
+// L.Class.include() - 在原有类的基础上，添加新的方法
+// 如果已经定义了一个类，则可以重新定义现有的属性/方法，或者可以使用 .include() 方法添加新的属性/方法：
+
+MyDemoClass.include({
+
+    // 一个私有属性
+    _myPrivateProperty: 78,
+
+    // 重写这个方法
+    myDemoMethod: function() { return this._myPrivateProperty; }
+
+});
+
+var mySecondDemoInstance = new MyDemoClass();
+
+console.log( mySecondDemoInstance.myDemoMethod() ); //78
+
+console.log( mySecondDemoInstance.myDemoProperty ); //42
+
+
+
+
+
+// L.Class.initialize() - L.Class 中的类的构造方法
+// 如果您的类有一些特定的 options，最好 L.setOptions() 在构造函数中初始化它们。此实用程序函数会将提供的选项与类的默认选项合并。
+var MyBoxClass = L.Class.extend({
+
+    options: {
+        width: 1,
+        height: 1
+    },
+
+    initialize: function(name, options) {
+        this.name = name;
+        L.setOptions(this, options);
+    }
+
+});
+
+var instance = new MyBoxClass('Red', {width: 10});
+
+console.log(instance.name); // Outputs "Red"
+console.log(instance.options.width); // Outputs "10"
+console.log(instance.options.height); // Outputs "1", the default
+
+
+// 父类的可用选项将被子类继承 - Leaflet 以一种特殊的方式处理 options 属性
+var MyCubeClass = MyBoxClass.extend({
+    options: {
+        depth: 1
+    }
+});
+
+var instance = new MyCubeClass('Blue');
+
+console.log(instance.options.width); // Outputs "1", parent class default
+console.log(instance.options.height); // Outputs "1", parent class default
+console.log(instance.options.depth); // Outputs "1"
+
+
+// L.Class.addInitHook()  - 子类运行父类构造函数，在运行自己的构造函数
+// 这个方法可以用来 “hook” 初始化函数，在类 initialize() 之后直接运行
+MyBoxClass.addInitHook(function(){
+    this._area = this.options.width * this.options.length;
+});
+console.log(instance._area);//undefined,使用错误么
+// addInitHook 有另一种语法 - 它使用方法名，并可以填入方法参数：
+MyCubeClass.include({
+    _calculateVolume: function(arg1, arg2) {
+        this._volume = this.options.width * this.options.length * this.options.depth;
+    }
+});
+
+MyCubeClass.addInitHook('_calculateVolume', argValue1, argValue2);
+
+// 父类的方法 - Function.call(...) - 略
+// Factories 工厂 - 略
+// 命名规范 - 略
+// https://leafletjs.cn/examples/extending/extending-1-classes.html
+</script>
+
+
+
+</body>
+</html>

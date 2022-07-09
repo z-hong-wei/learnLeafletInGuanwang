@@ -1,0 +1,30 @@
+在每个缩放级别，每个图块被分成四份，其大小（边的长度，由 tileSize 选项给出）加倍，使面积翻四倍 
+    (换句话说，世界的宽度和高度都是 256·2zoomlevel 像素):
+
+
+
+平移到赤道和北纬60°，我们可以看到比例尺翻倍
+    不等距，也不等面积
+
+
+
+其他设置缩放的方法有
+    setZoom(zoom) option?
+    setView(center, zoom), 这也设置了地图中心
+    flyTo(center, zoom), 像setView一样，拥有一个平滑的动画
+    zoomIn() / zoomIn(delta), 以 delta 为单位进行放大，默认为 1
+    zoomOut() / zoomOut(delta), 以 delta 为单位进行缩小，默认为 1
+    setZoomAround(fixedPoint, zoom), 在保持点固定的同时设置缩放级别（滚轮缩放）
+    fitBounds(bounds), 自动计算缩放以适应地图上的矩形区域
+
+    
+
+Fractional zoom - 以分数为单位进行缩放，例如：0.1
+    var map = L.map('map', {
+        zoomSnap: 0.25
+    });
+
+    var map = L.map('map', {
+        zoomDelta: 0.25,
+        zoomSnap: 0
+    });

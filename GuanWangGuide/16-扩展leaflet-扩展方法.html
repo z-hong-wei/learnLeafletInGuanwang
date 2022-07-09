@@ -1,0 +1,129 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	
+	<title>KittenLayer - Leaflet</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+
+	<link rel="stylesheet" href="../resource/leaflet.css"/>
+    <script src="../resource/leaflet.js"></script>
+
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+		#map {
+			width: 100%;
+			height: 100vh;
+		}
+	</style>
+
+	
+</head>
+<body>
+
+<div id='map'></div>
+
+<script type="text/javascript">
+
+	var map = L.map('map', {
+		crs: L.CRS.Simple,
+		center: [0, 0],
+		zoom: 5
+	});
+
+	L.TileLayer.Kitten = L.TileLayer.extend({
+		getTileUrl: function(coords) {
+			var i = Math.ceil( Math.random() * 4 );
+			return "https://placekitten.com/256/256?image=" + i;
+		},
+        getAttribution: function() {
+            return "<a href='https://placekitten.com/attribution.html'>PlaceKitten</a>"
+        }
+	});
+
+	L.tileLayer.kitten = function() {
+		return new L.TileLayer.Kitten();
+	}
+
+	map.addLayer( L.tileLayer.kitten() );
+	
+
+
+    // 组装插件 - 步骤
+    /*
+    1、创建L.KittenLayer.js文件并写入
+        L.TileLayer.Kitten = L.TileLayer.extend({
+            getTileUrl: function(coords) {
+                var i = Math.ceil( Math.random() * 4 );
+                return "https://placekitten.com/256/256?image=" + i;
+            },
+            getAttribution: function() {
+                return "<a href='https://placekitten.com/attribution.html'>PlaceKitten</a>"
+            }
+        });
+    
+    2、引入js文件
+        <script src='L.KittenLayer.js'>
+
+        var map = L.map('map-div-id');
+        L.tileLayer.kitten().addTo(map);
+    */ 
+        
+
+    // L.GridLayer 和 DOM 元素 - 略
+
+    // The pixel origin 像素原点 - 略
+
+
+    // onAdd 和 onRemove
+    // 从本质上讲，所有 L.Layer 都是地图窗格中的 HTML 元素，它们的位置和内容由图层代码定义
+    /* 流程：
+        地图调用图层的 onAdd() 方法，然后图层创建其HTML元素（通常称为’容器’元素）并将其添加到地图窗格中。
+        当图层从地图上删除时，它的 onRemove() 方法会被调用。
+        当添加到地图上时，图层必须更新其内容，并在地图视图更新时重新定位它们
+    */ 
+
+    L.CustomLayer = L.Layer.extend({
+        onAdd: function(map) {
+            var pane = map.getPane(this.options.pane);
+            this._container = L.DomUtil.create('...');
+
+            pane.appendChild(this._container);
+
+            // Calculate initial position of container with `L.Map.latLngToLayerPoint()`, `getPixelOrigin()` and/or `getPixelBounds()`
+
+            L.DomUtil.setPosition(this._container, point);
+
+            // Add and position children elements if needed
+
+            map.on('zoomend viewreset', this._update, this);
+        },
+
+        onRemove: function(map) {
+            L.DomUtil.remove(this._container);
+            map.off('zoomend viewreset', this._update, this);
+        },
+
+        _update: function() {
+            // Recalculate position of container
+
+            L.DomUtil.setPosition(this._container, point);        
+
+            // Add/remove/reposition children elements if needed
+        }
+    });
+
+    // 使用父级的 onAdd - 略
+</script>
+
+
+
+</body>
+</html>

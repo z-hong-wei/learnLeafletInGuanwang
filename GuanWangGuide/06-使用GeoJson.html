@@ -1,0 +1,338 @@
+<!--********************************************************************
+* Copyright© 2000 - 2022 SuperMap Software Co.Ltd. All rights reserved.
+*********************************************************************-->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>使用GeoJson</title>
+    <script type="text/javascript" src="../js/include-web.js"></script>
+</head>
+<body style=" margin: 0;overflow: hidden;background: #fff;width: 100%;height:100%;position: absolute;top: 0;">
+<div id="map" style="margin:0 auto;width: 100%;height: 100%"></div>
+<script type="text/javascript" src="../dist/leaflet/include-leaflet.js"></script>
+<script type="text/javascript">
+
+    // let mapurl ="http://localhost:8090/iserver/services/map-ChengduFresh/rest/maps/ChengduMap"
+    let mapurl = 'https://iserver.supermap.io/iserver/services/map-china400/rest/maps/China'
+    
+    let map = L.map('map', {
+        preferCanvas: true,
+        center: [39.89, 116.35],
+        maxZoom: 18,
+        zoom: 11
+    });
+    new L.supermap.ImageMapLayer(mapurl, {transparent: false}).addTo(map);
+
+    // Geojson数据网址
+    // http://datav.aliyun.com/portal/school/atlas/area_selector#&lat=31.769817845138945&lng=104.29901249999999&zoom=4
+
+    // Geojson数据类型  - https://blog.csdn.net/qq_17627195/article/details/125225582
+    // Point, LineString, Polygon, MultiPoint, MultiLineString, MultiPolygon和GeometryCollection
+
+    // Leaflet 支持上述所有的 GeoJSON 类型，但是 Features 和 FeatureCollections 效果最好
+    /*
+        type - Feature
+        {
+            "type": "Feature",
+            "properties": {"party": "Republican"},
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [[
+                [116.29161946687918, 39.756647760206455],
+                [116.26005097810592, 39.738159994514255],
+                [116.31907032668197, 39.740801407628574],
+                [116.29161946687918, 39.756647760206455]
+                ]]
+            }
+        }
+
+        type - FeatureCollections
+        {
+        "type":"FeatureCollection",
+        "features":[
+            {
+            "type": "Feature",
+            "id":"0",
+            "properties": {"party": "Republican"},
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [[
+                [116.29161946687918, 39.756647760206455],
+                [116.26005097810592, 39.738159994514255],
+                [116.31907032668197, 39.740801407628574],
+                [116.29161946687918, 39.756647760206455]
+                ]]
+            }
+        },{
+            "type": "Feature",
+            "id":"02",
+            "properties": {"party": "Republican"},
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [[
+                [116.29161946687918, 39.756647760206455],
+                [116.26005097810592, 39.738159994514255],
+                [116.31907032668197, 39.740801407628574],
+                [116.29161946687918, 39.756647760206455]
+                ]]
+            }
+        }
+        ]
+        };
+    */ 
+
+    // 在07 - 交互式地图中，还可以通过
+    /*
+
+    // 为鼠标移入的图层.target设置样式
+    var layer = e.target;
+
+    layer.setStyle({
+        weight: 5,
+        color: '#666',
+        dashArray: '',
+        fillOpacity: 0.7
+    });
+    layer.bringToFront();
+
+    和
+    // 重置样式  
+    geojson.resetStyle(e.target);
+
+    */ 
+
+
+    // 创建一个GeoJson对象
+    let geojsonFeature = {
+        "type": "Feature",
+        "properties": {
+            "name": "Coors Field",
+            "amenity": "Baseball Stadium",
+            "popupContent": "This is where the Rockies play!"
+        },
+        "geometry": {
+            "type": "Point",
+            "coordinates": [116.15,39.89]
+        }
+    };
+
+    // 将GeoJSON对象添加到图层中
+    L.geoJSON(geojsonFeature).addTo(map); //一个marker
+
+
+    // GeoJSON对象->数组
+    let myLines = [{
+        "type": "LineString",
+        "coordinates": [[116.19893,39.966531], [116.35613,39.969164], [116.52706,39.968637]]
+    }, {
+        "type": "LineString",
+        "coordinates": [[116.19893,39.996531], [116.35613,39.999164], [116.52706,39.998637]]
+    }];
+
+    L.geoJSON(myLines).addTo(map);
+
+
+    // 创建一个空的 GeoJSON 图层,以便传入更多特征
+    let myLayer = L.geoJSON().addTo(map);
+    let addgeojsonFeature = {
+        "type": "LineString",
+        "coordinates": [[116.369174,39.839518], [116.349953,39.971796], [116.341715,40.075437]]
+    }
+    
+    myLayer.addData(addgeojsonFeature);
+
+
+    // L.geoJSON()里的一些方法：style，pointToLayer，onEachFeature，filter
+    /*  也可以这样
+    	geojson = L.geoJson(euCountries).addTo(map);
+
+        geojson.eachLayer(function (layer) {
+            layer.bindPopup(layer.feature.properties.name);
+        });
+    */
+
+    // style - 为Geojson对象设置样式
+    // 同一样式
+    let myLines_style = [{
+        "type": "LineString",
+        "coordinates": [[116.26961801164802, 39.78711128481612],[116.3904017947804, 39.78605544206328],[116.46177403026775, 39.784999583107236]]
+    }, {
+        "type": "LineString",
+        "coordinates": [[116.38553991186822, 39.81389372315408],[116.38553991186822, 39.77377592957195],[116.38279482588796, 39.70192780600625]]
+    }];
+
+    let myStyle = {
+        "color": "#ff7800",
+        "weight": 5,
+        "opacity": 0.65
+    };
+
+    L.geoJSON(myLines_style, {
+        style: myStyle
+    }).addTo(map);
+
+    // 根据属性创建不同样式
+    let states = [{
+        "type": "Feature",
+        "properties": {"party": "Republican"},
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [[
+            [116.29161946687918, 39.756647760206455],
+            [116.26005097810592, 39.738159994514255],
+            [116.31907032668197, 39.740801407628574],
+            [116.29161946687918, 39.756647760206455]
+            ]]
+        }
+    }, {
+        "type": "Feature",
+        "properties": {"party": "Democrat"},
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [[
+            [116.3794723165922, 39.82053809453454],
+            [116.41584470583096, 39.82264870509923],
+            [116.39319774649364, 39.801539682339204],
+            [116.3794723165922, 39.82053809453454]
+            ]]
+        }
+    }];
+
+    L.geoJSON(states, {
+        style: function(feature) {
+            switch (feature.properties.party) {
+                case 'Republican': return {color: "#ff0000"};
+                case 'Democrat':   return {color: "#0000ff"};
+            }
+        }
+    }).addTo(map);
+
+
+
+
+    // pointToLayer - 默认情况下，GeoJSON 点会画出简单的标记,通过pointToLayer，可以改变
+    let geojsonMarkerOptions = {
+        radius: 12,
+        fillColor: "#ff7800",
+        color: "#000",
+        weight: 10,
+        opacity: 1,
+        fillOpacity: 0.8
+    };
+
+    let geojsonFeature_pointToLayer = {
+        "type": "Feature",
+        "properties": {
+            "name": "Coors Field",
+            "amenity": "Baseball Stadium",
+            "popupContent": "This is where the Rockies play!"
+        },
+        "geometry": {
+            "type": "Point",
+            "coordinates": [116.37808967525805,39.92913652594527]
+        }
+    };
+
+    L.geoJSON(geojsonFeature_pointToLayer, {
+        pointToLayer: function (feature, latlng) {//这里的latlng无需特别设置
+            return L.circleMarker(latlng, geojsonMarkerOptions);
+            // return L.circleMarker([39.929136525945275,116.37808967525805], geojsonMarkerOptions);
+        }
+    }).addTo(map);
+
+
+
+    // onEachFeature - 为每个feature进行调用 - 给每个feature添加点击弹出窗口事件
+    function forEachFeatureClick(feature, layer) {
+        if (feature.properties && feature.properties.popupContent) {
+            layer.bindPopup(feature.properties.popupContent);
+        }
+    }
+
+    let geojsonFeature_onEachFeature = [{
+        "type": "Feature",
+        "properties": {
+            "name": "Coors Field",
+            "amenity": "Baseball Stadium",
+            "popupContent": "This is where the Rockies play!"
+        },
+        "geometry": {
+            "type": "Point",
+            "coordinates": [116.3883837476841, 39.94388606214372]
+        }
+    },{
+        "type": "Feature",
+        "properties": {
+            "name": "Coors Field",
+            "amenity": "Baseball Stadium",
+            "popupContent": "This is where the Rockies play!"
+        },
+        "geometry": {
+            "type": "Point",
+            "coordinates": [116.35544271592073, 39.91385686958135]
+        }
+    },{
+        "type": "Feature",
+        "properties": {
+            "name": "Coors Field",
+            "amenity": "Baseball Stadium",
+            "popupContent": "This is where the Rockies play!"
+        },
+        "geometry": {
+            "type": "Point",
+            "coordinates": [116.42201105094253, 39.91227602087322]
+        }
+    }];
+
+    L.geoJSON(geojsonFeature_onEachFeature, {
+        onEachFeature: forEachFeatureClick
+    }).addTo(map);
+
+
+
+
+    // filter - 控制 GeoJSON feature 的可见性 - 还是每个Feature都会调用
+    let Features_filter = [{
+        "type": "Feature",
+        "properties": {
+            "name": "Coors Field",
+            "show_on_map": true
+        },
+        "geometry": {
+            "type": "Point",
+            "coordinates": [116.35338390143552, 39.88592317107656]
+        }
+    }, {
+        "type": "Feature",
+        "properties": {
+            "name": "Busch Field",
+            "show_on_map": true
+        },
+        "geometry": {
+            "type": "Point",
+            "coordinates": [116.42681495140803, 39.88592317107656]
+        }
+    },{
+        "type": "Feature",
+        "properties": {
+            "name": "Busch Field",
+            "show_on_map": false
+        },
+        "geometry": {
+            "type": "Point",
+            "coordinates": [116.38769747618902, 39.8527041525669]
+        }
+    }];
+
+    L.geoJSON(Features_filter, {
+        filter: function(feature, layer) {
+            return feature.properties.show_on_map;
+        }
+    }).addTo(map);
+
+
+
+</script>
+</body>
+</html>

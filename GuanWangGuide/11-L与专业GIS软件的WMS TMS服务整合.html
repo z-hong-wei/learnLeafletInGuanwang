@@ -1,0 +1,112 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	
+	<title>WMS example - Leaflet</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+
+    <link rel="stylesheet" href="../resource/leaflet.css"/>
+    <script src="../resource/leaflet.js"></script>
+
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+		#map {
+			width: 100%;
+			height: 100vh;
+		}
+	</style>
+
+	
+</head>
+<body>
+
+<div id='map'></div>
+
+<script>
+
+var map = L.map('map', {
+		center: [-17, -67],
+		zoom: 3
+	});
+    // Leaflet 中 layer 的概念与 WMS 中 layer 的概念不同！
+
+    //  图层 - TOPO-OSM-WMS （此服务底图）
+	var wmsLayer = L.tileLayer.wms('http://ows.mundialis.de/services/service?', {
+		layers: 'TOPO-OSM-WMS' 
+	}).addTo(map);
+
+    // 图层 - SRTM30-Colored-Hillshade
+    var wmsLayer = L.tileLayer.wms('http://ows.mundialis.de/services/service?', {
+        layers: 'SRTM30-Colored-Hillshade'
+    }).addTo(map);
+
+    // wms-layers:该 layers 选项是以逗号分隔的图层列表。如果 WMS 服务定义了多个图层，则对地图图像的请求可以引用多个图层。
+    var topographyAndPlaces = L.tileLayer.wms('http://ows.mundialis.de/services/service?', {
+        layers: 'TOPO-WMS,OSM-Overlay-WMS'
+    }).addTo(map);
+
+
+    // 结合图层管理器 - 当需要多个图层时，由 WMS 服务器决定如何组合图层。
+    var basemaps = {
+        Topography: L.tileLayer.wms('http://ows.mundialis.de/services/service?', {
+            layers: 'TOPO-WMS'
+        }),
+
+        Places: L.tileLayer.wms('http://ows.mundialis.de/services/service?', {
+            layers: 'OSM-Overlay-WMS'
+        }),
+
+        'Topography, then places': L.tileLayer.wms('http://ows.mundialis.de/services/service?', {
+            layers: 'TOPO-WMS,OSM-Overlay-WMS'
+        }),
+
+        'Places, then topography': L.tileLayer.wms('http://ows.mundialis.de/services/service?', {
+            layers: 'OSM-Overlay-WMS,TOPO-WMS'
+        })
+    };
+
+    L.control.layers(basemaps).addTo(map);
+
+    basemaps.Topography.addTo(map);
+
+    // 还要注意 Leaflet 支持很少的坐标系：CRS:3857，CRS:3395 和 CRS:4326（见 L.CRS 的文档）
+    // 如果您的 WMS 服务不提供这些坐标系中的图像，则您可能需要使用 Proj4Leaflet 在 Leaflet 中使用不同的坐标系。
+    // 除此之外，只需在初始化地图时使用正确的 CRS，添加的任何 WMS 图层都将使用它：
+    /*
+        var map = L.map('map', {
+            crs: L.CRS.EPSG4326
+        });
+
+        var wmsLayer = L.tileLayer.wms('http://ows.mundialis.de/services/service?', {
+            layers: 'TOPO-OSM-WMS'
+        }).addTo(map);
+    */ 
+
+
+    // Leaflet 中的 TMS
+    // TMS -url - http://base_url/tms/1.0.0/ {tileset} / {z} / {x} / {y} .png
+
+    // 使用TMS图层
+    var tms_example = L.tileLayer('http://base_url/tms/1.0.0/example_layer@png/{z}/{x}/{y}.png', {
+        tms: true
+    }).addTo(map);
+
+    // 在 Leaflet 1.0 中的一个新功能是能够在 URL 中使用 {-y} 而不是 tms: true 选项
+    // L.TileLayer 的坐标原点是左上角，所以 Y 坐标向下。在TMS中 坐标的原点是左下角，所以 Y 坐标是向上的。
+    var layer = L.tileLayer('http://base_url/tms/1.0.0/tileset/{z}/{x}/{-y}.png');
+
+    // 除了 y 坐标和 tilesets 发现的差异之外，TMS 服务完全按照 L.TileLayer 预期的方式提供瓦片。
+</script>
+
+
+
+</body>
+</html>
